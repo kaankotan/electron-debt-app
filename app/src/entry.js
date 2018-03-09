@@ -9,9 +9,17 @@
 
 import React from 'react'
 import { render } from 'react-dom'
+import { HashRouter, Route, Switch } from 'react-router-dom'
+
 import App from './App.jsx'
+import Register from './Register.jsx'
 
 render(
-  <App/>,
+  <HashRouter>
+    <div>
+      <Route exact path="/" component={App} />
+      <Route exact path="/register" component={Register} />
+    </div>
+  </HashRouter>,
   document.getElementById('app')
 )

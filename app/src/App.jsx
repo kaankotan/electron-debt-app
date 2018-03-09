@@ -1,20 +1,54 @@
-import React, {Component} from 'react'
-import {render} from 'react-dom'
+import React, { Component } from 'react'
+import { render } from 'react-dom'
 import {} from './styles/global.css'
 import 'semantic-ui-css/semantic.min.css'
 import * as appConstants from './Constants.jsx'
 import Link from './components/Link.jsx'
+import { remote } from 'electron'
 
-import { Input } from 'semantic-ui-react'
+import { Input, Button, Divider, Header,
+  Icon, Label } from 'semantic-ui-react'
+
+var mongoClient = require('mongodb').MongoClient
+const DB_URI = 'mongodb://orhaneee:trizmir3@cluster-0-shard-00-00-5hq5j.mongodb.net:27017,cluster-0-shard-00-01-5hq5j.mongodb.net:27017,cluster-0-shard-00-02-5hq5j.mongodb.net:27017/data?ssl=true&replicaSet=cluster-0-shard-0&authSource=admin'
 
 export default class App extends Component {
+  
   constructor() {
     super()
+    this.state = {
+      username: '',
+      password: ''
+    }
     this.resize = this.resize.bind(this)
+    this.handleStart = this.handleStart.bind(this)
+    this.handleRegister = this.handleRegister.bind(this)
+  }
+
+  componentDidMount() {
+    mongoClient.connect(DB_URI, function(err, db) {
+      if(err) throw err
+      db.db('data').collection('users').insert({
+        'username': 'orhaneee',
+        'password': 'trizmir3',
+        'email': 'orhanistenhickorkmaz@std.iyte.edu.tr',
+        'debts': []
+      })
+
+      db.close()
+    })
+  }
+
+  handleRegister() {
+    this.props.history.push('/register')
+  }
+
+  handleStart() {
+    /* Should start app. */
   }
 
   resize() {
-    this.forceUpdate()
+    remote.getCurrentWindow().reload()
   }
 
   componentWillMount() {
@@ -36,6 +70,7 @@ export default class App extends Component {
         <br /><br />
         <Input
           style={{ minWidth: appConstants.buttonWidth }}
+          onChange={(event, data) => this.setState({ username: event.target.value })}
           label={{ content: 'Kullanıcı adı' }}
           labelPosition='right'
         />
@@ -43,9 +78,16 @@ export default class App extends Component {
         <Input
           style={{ minWidth: appConstants.buttonWidth,
             marginTop: appConstants.buttonMarginTop }}
+          onChange={(event, data) => this.setState({ password: event.target.value })}
+          type='password'
           label={{ content: 'Şifre' }}
           labelPosition='right'
         />
+        <br /><br /><br />
+        <Button inverted color='green' onClick={this.handleStart}>Başla!</Button>
+        <br />
+        <Divider />
+        <Label as='a' color='teal' size='large' tag onClick={this.handleRegister}>Kayıt ol!</Label>
       </div>
     )
   }

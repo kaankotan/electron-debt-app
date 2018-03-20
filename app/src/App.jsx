@@ -13,38 +13,45 @@ var mongoClient = require('mongodb').MongoClient
 const DB_URI = 'mongodb://orhaneee:trizmir3@cluster-0-shard-00-00-5hq5j.mongodb.net:27017,cluster-0-shard-00-01-5hq5j.mongodb.net:27017,cluster-0-shard-00-02-5hq5j.mongodb.net:27017/data?ssl=true&replicaSet=cluster-0-shard-0&authSource=admin'
 
 export default class App extends Component {
-  
+
   constructor() {
     super()
     this.state = {
       username: '',
-      password: ''
+      password: '',
+      open: false,
+      message: ''
     }
     this.resize = this.resize.bind(this)
     this.handleStart = this.handleStart.bind(this)
     this.handleRegister = this.handleRegister.bind(this)
   }
 
-  componentDidMount() {
-    mongoClient.connect(DB_URI, function(err, db) {
-      if(err) throw err
-      db.db('data').collection('users').insert({
-        'username': 'orhaneee',
-        'password': 'trizmir3',
-        'email': 'orhanistenhickorkmaz@std.iyte.edu.tr',
-        'debts': []
-      })
-
-      db.close()
-    })
-  }
+  show = () => this.setState({ open: true })
+  handleConfirm = () => this.setState({ open: false })
+  handleCancel = () => this.setState({ open: false })
 
   handleRegister() {
     this.props.history.push('/register')
   }
 
   handleStart() {
-    /* Should start app. */
+    /* Should start app with login */
+    var _this = this
+    mongoClient.connect(DB_URI, function(err, db) {
+      if(err) throw err
+      db.db('data').collection('users').find({ 'username': _this.state.username })
+      .toArray(function(err, results) {
+        if(results.length === 0) {
+          _this.setState({ open: true })
+          _this.setState({ message: 'Kullanıcı bulunamadı :(' })
+        }
+        else {
+          _this.props.history.push('/main')
+        }
+      })
+      db.close()
+    })
   }
 
   resize() {
@@ -59,6 +66,7 @@ export default class App extends Component {
   }
 
   render() {
+    const { open, size } = this.state
     return (
       <div>
         <div className="hello">
@@ -84,10 +92,11 @@ export default class App extends Component {
           labelPosition='right'
         />
         <br /><br /><br />
-        <Button inverted color='green' onClick={this.handleStart}>Başla!</Button>
-        <br />
+        {this.state.open ? <p style={{ fontSize: appConstants.smallFontSize }}>{this.state.message}</p> :
+        <Button inverted color='green' onClick={this.handleStart}>Başla!</Button>}
         <Divider />
         <Label as='a' color='teal' size='large' tag onClick={this.handleRegister}>Kayıt ol!</Label>
+
       </div>
     )
   }

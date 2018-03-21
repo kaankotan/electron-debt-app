@@ -8,6 +8,9 @@ import { remote } from 'electron'
 
 import { Input, Button } from 'semantic-ui-react'
 
+var mongoClient = require('mongodb').MongoClient
+const DB_URI = 'mongodb://orhaneee:trizmir3@cluster-0-shard-00-00-5hq5j.mongodb.net:27017,cluster-0-shard-00-01-5hq5j.mongodb.net:27017,cluster-0-shard-00-02-5hq5j.mongodb.net:27017/data?ssl=true&replicaSet=cluster-0-shard-0&authSource=admin'
+
 export default class App extends Component {
   constructor() {
     super()
@@ -21,7 +24,23 @@ export default class App extends Component {
   }
   
   addUser() {
-    
+    /* Handling register */
+    var _this = this
+    mongoClient.connect(DB_URI, function(err, db) {
+      if(err) throw err
+      let userObject = { username: _this.state.username, password: _this.state.password,
+        email: _this.state.email, debts: [] }
+      db.db('data').collection('users').insertOne(userObject, function(err, res) {
+        if(err) throw err
+        db.close()
+        if(_this.state.username.length !== 0 && _this.state.password.length !== 0) {
+          const Store = require('electron-store')
+          const store = new Store()
+          store.set('username', _this.state.username)
+          _this.props.history.push('/main')
+        }
+      })
+    })
   }
 
   resize() {

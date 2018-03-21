@@ -13,12 +13,14 @@ import { HashRouter, Route, Switch } from 'react-router-dom'
 
 import App from './App.jsx'
 import Register from './Register.jsx'
+import Main from './Main.jsx'
 
 render(
   <HashRouter>
     <div>
       <Route exact path="/" component={App} />
       <Route exact path="/register" component={Register} />
+      <Route exact path="/main" component={Main} />
     </div>
   </HashRouter>,
   document.getElementById('app')

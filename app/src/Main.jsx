@@ -5,10 +5,11 @@ import {} from './styles/global.css'
 import 'semantic-ui-css/semantic.min.css'
 import * as appConstants from './Constants.jsx'
 import * as animationData from './loader_spinner.json'
+import * as happyAnimation from './happy.json'
 import Link from './components/Link.jsx'
 import { remote } from 'electron'
 
-import { Input, Button } from 'semantic-ui-react'
+import { Button } from 'semantic-ui-react'
 
 var mongoClient = require('mongodb').MongoClient
 const DB_URI = 'mongodb://orhaneee:trizmir3@cluster-0-shard-00-00-5hq5j.mongodb.net:27017,cluster-0-shard-00-01-5hq5j.mongodb.net:27017,cluster-0-shard-00-02-5hq5j.mongodb.net:27017/data?ssl=true&replicaSet=cluster-0-shard-0&authSource=admin'
@@ -54,6 +55,12 @@ export default class App extends Component {
     window.removeEventListener('resize', this.resize)
   }
 
+  handleDebtAdd = () => {
+    const BrowserWindow = remote.BrowserWindow
+    let win = new BrowserWindow({ width: 800, height: 600 })
+    win.loadURL(`file://${__dirname}/index.html`)
+  }
+
   render() {
     const isRequesting = this.state.isRequesting
     const defaultOptions = {
@@ -61,23 +68,42 @@ export default class App extends Component {
       autoplay: true, 
       animationData: animationData
     }
+    const noDebtOptions = {
+      loop: true,
+      autoplay: true,
+      animationData: happyAnimation
+    }
     return (
       (isRequesting ? 
         <Lottie options={defaultOptions}
           height={400}
           width={400}
           isStopped={this.state.isStopped}
-          isPaused={this.state.isPaused}/>
+          isPaused={this.state.isPaused} />
         :
-        <div>
-          <div className="hello">
-            <h1>Kayıt olarak, kullanıcı kabul sözleşmemize uymuş oluyorsun.</h1>
+        (this.state.debts.length === 0 
+          ?
+          <div>
+            <Button color="orange" floated="right" 
+              style={{ marginRight: window.innerWidth / 30 }}
+              onClick={this.handleDebtAdd}>Yeni Borç Ekle!</Button>
+            <br /><br /><br />
+            <Lottie options={noDebtOptions}
+              height={appConstants.animationSize}
+              width={appConstants.animationSize} />
+            <p style={{ fontSize: appConstants.smallFontSize }}>Veresiye defteriniz boş, kimseden alacağınız yok!</p>
           </div>
-          <p>
-            İstediğin platformda, hesapların seninle.
-          </p>
-          <br /><br />
-        </div>
+          :
+          <div>
+            <div className="hello">
+              <h1>Kayıt olarak, kullanıcı kabul sözleşmemize uymuş oluyorsun.</h1>
+            </div>
+            <p>
+              İstediğin platformda, hesapların seninle.
+            </p>
+            <br /><br />
+          </div>
+        )
       )
     )
   }

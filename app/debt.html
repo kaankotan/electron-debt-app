@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+      <meta charset="utf-8">
+      <title>VKU | Borç Ekle</title>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.css">
+      <link rel="stylesheet" href="src/styles/global.css">
+      <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+      <script src="https://code.jquery.com/jquery-3.2.1.min.js" type="text/javascript"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.9/semantic.min.js" type="text/javascript"></script>
+      <script src="https://cdn.rawgit.com/mdehoog/Semantic-UI-Calendar/76959c6f7d33a527b49be76789e984a0a407350b/dist/calendar.min.js"></script>
+      <link href="https://cdn.rawgit.com/mdehoog/Semantic-UI-Calendar/76959c6f7d33a527b49be76789e984a0a407350b/dist/calendar.min.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <div>
+      <p style="font-size: 20px; font-family: 'Raleway';">Aşağıdan sana en kolay gelecek şekilde borç ekleyebilirsin!</p>
+      <div class="ui left icon input">
+          <input type="text" style="font-family: 'Raleway'; font-size: 16px;" placeholder="Kişinin Adı">
+          <i class="users icon"></i>
+      </div>
+      <br /><br />
+      <div class="ui right labeled input">
+          <label for="amount" class="ui label">$</label>
+          <input type="text" style="font-family: 'Raleway'; font-size: 16px;" placeholder="Miktar" id="amount">
+          <div class="ui basic label">.00</div>
+      </div>
+      <div class="ui form">
+          <div class="two fields">
+            <div class="field">
+              <br />
+              <label style="font-family: 'Raleway'; font-size: 16px;">Veriş Tarihi</label>
+              <div class="ui calendar" id="rangestart">
+                <div class="ui input left icon">
+                  <i class="calendar icon"></i>
+                  <input type="text" placeholder="Start">
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <br />
+              <label style="font-family: 'Raleway'; font-size: 16px;">Ödenmesi Gereken Tarih</label>
+              <div class="ui calendar" id="rangeend">
+                <div class="ui input left icon">
+                  <i class="calendar icon"></i>
+                  <input type="text" placeholder="End">
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+      <br />
+      <button class="ui yellow basic button" style="font-family: 'Raleway'; font-size: 16px; margin-left: 35%">Kaydet!</button>
+    </div>
+
+    <script>
+      $('#rangestart').calendar({
+        type: 'date',
+        endCalendar: $('#rangeend')
+      });
+      $('#rangeend').calendar({
+        type: 'date',
+        startCalendar: $('#rangestart')
+      });
+    </script>
+    <script>
+      var mongoClient = require('mongodb').MongoClient;
+      const DB_URI = 'mongodb://orhaneee:trizmir3@cluster-0-shard-00-00-5hq5j.mongodb.net:27017,cluster-0-shard-00-01-5hq5j.mongodb.net:27017,cluster-0-shard-00-02-5hq5j.mongodb.net:27017/data?ssl=true&replicaSet=cluster-0-shard-0&authSource=admin'
+      
+    </script>
+  </body>
+</html>

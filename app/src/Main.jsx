@@ -57,8 +57,8 @@ export default class App extends Component {
 
   handleDebtAdd = () => {
     const BrowserWindow = remote.BrowserWindow
-    let win = new BrowserWindow({ width: 800, height: 600 })
-    win.loadURL(`file://${__dirname}/index.html`)
+    let win = new BrowserWindow({ width: 1024, height: 768 })
+    win.loadURL(`file://${__dirname}/debt.html`)
   }
 
   render() {

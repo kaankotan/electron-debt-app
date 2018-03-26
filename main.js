@@ -11,4 +11,10 @@ let mainWindow
 app.on('ready', () => {
     let mainWindow = new BrowserWindow({ width: 800, height: 600 })
     mainWindow.loadURL(`file://${__dirname}/app/index.html`)
+    const ipcMain = require('electron').ipcMain
+    ipcMain.on('new-debt-added', function(event, arg) {
+        console.log(arg)
+        mainWindow.webContents.send('new-debt-added', arg)
+    })
 })
+

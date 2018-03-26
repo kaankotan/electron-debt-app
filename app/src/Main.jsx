@@ -49,6 +49,11 @@ export default class App extends Component {
       })
     })
 
+    const ipcRenderer = require('electron').ipcRenderer
+    ipcRenderer.on('new-debt-added', function(event, arg) {
+      console.log(arg)
+    })
+
     window.addEventListener('resize', this.resize)
   }
   componentWillUnmount() {

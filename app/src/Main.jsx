@@ -7,7 +7,7 @@ import * as appConstants from './Constants.jsx'
 import * as animationData from './loader_spinner.json'
 import * as happyAnimation from './happy.json'
 import Link from './components/Link.jsx'
-import { remote } from 'electron'
+import { remote, Tray } from 'electron'
 
 import { Button } from 'semantic-ui-react'
 import * as FontAwesome from 'react-icons/lib/fa'
@@ -49,6 +49,7 @@ export default class App extends Component {
         }, 2000)
         _this.setState({ debts: results[0].debts })
         console.log(results[0])
+
       })
     })
 

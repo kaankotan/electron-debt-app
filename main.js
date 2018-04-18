@@ -11,7 +11,7 @@ let mainWindow
 app.setAppUserModelId('electron-windows-notifications')
 
 app.on('ready', () => {
-    let mainWindow = new BrowserWindow({ width: 800, height: 600 })
+    let mainWindow = new BrowserWindow({ width: 800, height: 600, icon: 'app/electron.png' })
     mainWindow.loadURL(`file://${__dirname}/app/index.html`)
     const ipcMain = require('electron').ipcMain
     ipcMain.on('new-debt-added', function(event, arg) {

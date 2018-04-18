@@ -8,6 +8,7 @@ import * as animationData from './loader_spinner.json'
 import * as happyAnimation from './happy.json'
 import Link from './components/Link.jsx'
 import { remote, Tray } from 'electron'
+import moment from 'moment'
 
 import { Button } from 'semantic-ui-react'
 import * as FontAwesome from 'react-icons/lib/fa'
@@ -41,15 +42,15 @@ export default class App extends Component {
     this.setState({ username: _username })
     var _this = this
 
-    const appId = 'electron-windows-notifications'
-    const { ToastNotification } = require('electron-windows-notifications')
-    let notification = new ToastNotification({
-        appId: appId,
-        template: `<toast><visual><binding template="ToastText01"><text id="1">%s</text></binding></visual></toast>`,
-        strings: ['Hi there!']
+    var path = require('path')
+    /* let myNotification = new Notification('VKU | CENG', {
+      body: 'Uygulamaya hoşgeldin!',
+      icon: path.join(__dirname, 'electron.png')
     })
-    notification.on('activated', () => console.log('Activated!'))
-    notification.show()
+    
+    myNotification.onclick = () => {
+      console.log('Notification clicked')
+    } */
 
     mongoClient.connect(DB_URI, function(err, db) {
       if(err) throw err
@@ -60,10 +61,23 @@ export default class App extends Component {
         }, 2000)
         _this.setState({ debts: results[0].debts })
         console.log(results[0])
+        for(let idx = 0; idx < results[0].debts.length; idx++) {
+          if(results[0].debts[idx].length !== 0) {
+            if(moment(results[0].debts[idx].end, 'MMM DD, YYYY').isBefore(moment(new Date()))) {
+              console.log('Late')
+              let lateNotification = new Notification('Ödenmemiş Veresiye', {
+                body: results[0].debts[idx].name + ' sizden aldığı ' 
+                  + results[0].debts[idx].value + 
+                  ' TL değerindeki veresiyeyi ödememiş!',
+                icon: path.join(__dirname, 'electron.png')
+              })
+            }
+          }
+        }
       })
     })
 
-    const ipcRenderer = require('electron').iepcRenderer
+    const ipcRenderer = require('electron').ipcRenderer
     ipcRenderer.on('new-debt-added', function(event, arg) {
       console.log(arg)
       _this.setState({ newAddedDebt: arg })

@@ -28,6 +28,10 @@ module.exports = {
                 }
             },
             {
+                test: /\.node$/,
+                use: 'node-loader'
+            },
+            {
                 test: /\.css$/,
                 loader: ExtractTextPlugin.extract({
                     loader: 'css-loader'

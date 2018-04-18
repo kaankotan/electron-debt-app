@@ -40,6 +40,17 @@ export default class App extends Component {
     let _username = store.get('username')
     this.setState({ username: _username })
     var _this = this
+
+    const appId = 'electron-windows-notifications'
+    const { ToastNotification } = require('electron-windows-notifications')
+    let notification = new ToastNotification({
+        appId: appId,
+        template: `<toast><visual><binding template="ToastText01"><text id="1">%s</text></binding></visual></toast>`,
+        strings: ['Hi there!']
+    })
+    notification.on('activated', () => console.log('Activated!'))
+    notification.show()
+
     mongoClient.connect(DB_URI, function(err, db) {
       if(err) throw err
       db.db('data').collection('users').find({ 'username': _username })
@@ -49,11 +60,10 @@ export default class App extends Component {
         }, 2000)
         _this.setState({ debts: results[0].debts })
         console.log(results[0])
-
       })
     })
 
-    const ipcRenderer = require('electron').ipcRenderer
+    const ipcRenderer = require('electron').iepcRenderer
     ipcRenderer.on('new-debt-added', function(event, arg) {
       console.log(arg)
       _this.setState({ newAddedDebt: arg })

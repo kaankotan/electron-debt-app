@@ -29,6 +29,14 @@ export default class App extends Component {
     }
     this.resize = this.resize.bind(this)
     this.makeDateTurkish = this.makeDateTurkish.bind(this)
+    this.handleNewDebt = this.handleNewDebt.bind(this)
+    this.handleSignout = this.handleSignout.bind(this)
+  }
+
+  handleSignout() {
+    this.props.history.replace('/')
+    this.setState({ isRequesting: true })
+    remote.getCurrentWindow().reload()
   }
 
   resize() {
@@ -76,17 +84,30 @@ export default class App extends Component {
         }
       })
     })
-
-    const ipcRenderer = require('electron').ipcRenderer
-    ipcRenderer.on('new-debt-added', function(event, arg) {
-      console.log(arg)
-      _this.setState({ newAddedDebt: arg })
-    })
-
     window.addEventListener('resize', this.resize)
   }
+
+  handleNewDebt(event, arg) {
+    var _this = this
+    console.log(arg)
+    _this.setState({ newAddedDebt: arg })
+    var currentDebtArray = _this.state.debts
+    currentDebtArray.push(JSON.parse(arg))
+    _this.setState({ debts: currentDebtArray })
+    setTimeout(function() {
+      _this.setState({ newAddedDebt: null })
+    }, 5000)
+  }
+
+  componentDidMount() {
+    var _this = this
+    const ipcRenderer = require('electron').ipcRenderer
+    ipcRenderer.on('new-debt-added', this.handleNewDebt)
+  }
+
   componentWillUnmount() {
     window.removeEventListener('resize', this.resize)
+    ipcRenderer.removeListener('new-debt-added', this.handleNewDebt)
   }
 
   makeDateTurkish(date) {
@@ -154,46 +175,73 @@ export default class App extends Component {
       autoplay: true,
       animationData: happyAnimation
     }
-    return (
-      (isRequesting ? 
+    if(isRequesting) {
+      return (
         <Lottie options={defaultOptions}
           height={400}
           width={400}
           isStopped={this.state.isStopped}
           isPaused={this.state.isPaused} />
-        :
-        (this.state.debts.length === 0 
-          ?
-          <div>
-            <Button color="orange" floated="right" 
-              style={{ marginRight: window.innerWidth / 30 }}
-              onClick={this.handleDebtAdd}>Yeni Borç Ekle!</Button>
-            <br /><br /><br />
-            <Lottie options={noDebtOptions}
-              height={appConstants.animationSize}
-              width={appConstants.animationSize} />
-            <p style={{ fontSize: appConstants.smallFontSize }}>Veresiye defteriniz boş, kimseden alacağınız yok!</p>
+      );
+    }
+    if(!isRequesting && this.state.debts.length === 0 
+      && this.state.newAddedDebt === null) {
+      return (
+        <div>
+          <Button color="orange" floated="right" 
+            style={{ marginRight: window.innerWidth / 30 }}
+            onClick={this.handleDebtAdd}>Yeni Borç Ekle!</Button>
+          <Button color="red" floated="left" 
+            style={{ marginLeft: window.innerWidth / 30 }}
+            onClick={this.handleSignout}>Çıkış Yap!</Button>
+          <br /><br /><br />
+          <Lottie options={noDebtOptions}
+            height={appConstants.animationSize}
+            width={appConstants.animationSize} />
+          <p style={{ fontSize: appConstants.smallFontSize }}>Veresiye defteriniz boş, kimseden alacağınız yok!</p>
+        </div>
+      );
+    }
+    if(!isRequesting && this.state.debts.length !== 0
+      && this.state.newAddedDebt === null) {
+      return (
+        <div>
+          <Button color="orange" floated="right" 
+            style={{ marginRight: window.innerWidth / 30 }}
+            onClick={this.handleDebtAdd}>Yeni Borç Ekle!</Button>
+          <Button color="red" floated="left" 
+            style={{ marginLeft: window.innerWidth / 30 }}
+            onClick={this.handleSignout}>Çıkış Yap!</Button>
+          <br /><br /><br />
+          <div className="hello">
+            <h1>Veresiye listeni sana gösteriyoruz.</h1>
           </div>
-          :
-          <div>
-            <div className="hello">
-              <h1>Veresiye listeni sana gösteriyoruz.</h1>
-            </div>
-            {this.state.debts.map(function(item, i) {
-              return (
-                <div key={i}>
-                  <p style={{ fontSize: appConstants.smallFontSize }}>
-                    <FontAwesome.FaExclamation style={{ color: 'red', fontSize: '46px' }} />
-                    {makeDateTurkish(item.start)} tarihinde verdiğin <FontAwesome.FaCreditCard 
-                    style={{ fontSize: '46px', color: 'green' }} /> {item.value} TL tutarındaki veresiyen var! Son ödeme 
-                    günü de {makeDateTurkish(item.end)}. </p>
-                </div>
-              )
-            })}
-            <br /><br />
+          {this.state.debts.map(function(item, i) {
+            return (
+              <div key={i}>
+                <p style={{ fontSize: appConstants.smallFontSize }}>
+                  {makeDateTurkish(item.start)} tarihinde verdiğin <FontAwesome.FaCreditCard 
+                  style={{ fontSize: '46px', color: 'green' }} /> {item.value} TL tutarındaki veresiyen var! Son ödeme 
+                  günü de {makeDateTurkish(item.end)}. </p>
+              </div>
+            )
+          })}
+          <br /><br />
+        </div>
+      );
+    }
+    if(this.state.newAddedDebt !== null) {
+      return (
+        <div>
+          <div className="hello">
+            <h1>Yeni bir borç ekledin!</h1>
           </div>
-        )
-      )
-    )
+          <p style={{ fontSize: appConstants.smallFontSize }}>
+            {JSON.parse(this.state.newAddedDebt).name + ` kişisine ` + 
+            JSON.parse(this.state.newAddedDebt).value + `$ tutarında bir veresiye eklediniz! `}</p>
+        </div>
+      );
+    }
+
   }
 }

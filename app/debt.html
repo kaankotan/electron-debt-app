@@ -96,9 +96,10 @@
               db.close();
               ipcRenderer.send('new-debt-added', JSON.stringify(newDebt));
               const window = require('electron').remote.getCurrentWindow();
-              setTimeout(() => {
+              var newDebtTimer = setTimeout(() => {
                 window.close();
-              }, 1500);
+                clearInterval(newDebtTimer);
+              }, 500);
             });
           });
         });

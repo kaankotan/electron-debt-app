@@ -45,6 +45,9 @@ export default class App extends Component {
         if(results.length === 0) {
           _this.setState({ open: true })
           _this.setState({ message: 'Kullanıcı bulunamadı :(' })
+          setInterval(function() {
+            _this.setState({ open: false })
+          }, 3000)
         }
         else {
           const Store = require('electron-store')
